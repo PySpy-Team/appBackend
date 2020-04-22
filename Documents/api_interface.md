@@ -3,7 +3,7 @@
 - response: 
 ```
 [
-  0: [10 challenge for first page ]
+  0: [10 challenges for first page ]
   1: [ ... for second page ]
   ...
 ]
