@@ -1,6 +1,6 @@
 **GET:**`url/api/v1/challenges`<br>
 - job: return all available challenges from database<br>
-- interface: 
+- response: 
 ```
 [
   0: [10 challenge for first page ]
@@ -11,8 +11,8 @@
 
 **GET:**`url/api/v1/challenges ? page=1`<br>
 - job: return 10 challenges which belongs to first page <br>
- - note: each page contain 10 challenges
-- interface: 
+ - note: each page contains 10 challenges
+- response: 
 ```
 [ 
   0: { ... }
