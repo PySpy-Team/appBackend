@@ -1,51 +1,43 @@
-**POST:**`url/api/v1/challenges`<br>
-**body:**
+**GET:**`url/api/v1/challenges`<br>
+- job: return all available challenges from database<br>
+- interface: 
 ```
-{
-  startRange: <int>,
-  endRange: <int>
-}
+[
+  0: [10 challenge for first page ]
+  1: [ ... for second page ]
+  ...
+]
 ```
-returns summary of challenges from `startRange` to `endRange`.
+
+**GET:**`url/api/v1/challenges ? page=1`<br>
+- job: return 10 challenges which belongs to first page <br>
+ - note: each page contain 10 challenges
+- interface: 
 ```
-{
-  challengesSummary:[
+[ 
+  0: { ... }
+]
+```
+
+- page interface: 
+```
+[
+  page: [
     {
-      ID: <int>,
-      subject: <str>,
-      text: <str>,
-      percentOfCorrectAnswers: <int>,
-      authorName: <str>,
+      challeng_title: text
+      challenge_content: text
+      challenge_id: number
+      xp: number
     }
   ]
-}
+]
 ```
 
-<hr>
-
-**POST:**`url/api/v1/challenge`<br>
-**body:**
-```
-{
-  ID: <int>,
-}
-```
-returns summary of challenges from `startRange` to `endRange`.
-```
-{
-  ID: <int>,
-  subject: <str>,
-  text: <str>,
-  percentOfCorrectAnswers: <int>,
-  choices: []
-  authorName: <str>,
-}
-```
 <hr>
 
 **POST**: `url/api/auth/signup`
 <br>
-**body:**:
+- body:
 ```
 {
     username: <str emailAddr>
@@ -53,7 +45,13 @@ returns summary of challenges from `startRange` to `endRange`.
     name: <str>
 }
 ```
-<hr>
+- response: ```
+{
+  message: "402 all correct." | "409 conflict"
+}
+```
+ - status codes: 402: all correct, 409: "not correct"
+
 
 **POST**: `url/api/auth/signin`
 <br>
@@ -64,3 +62,10 @@ returns summary of challenges from `startRange` to `endRange`.
     password: <str encrypted>
 }
 ```
+- response: ```
+{
+  message: "402 all correct." | "409 conflict"
+}
+```
+ - status codes: 402: all correct, 409: "not correct"
+
