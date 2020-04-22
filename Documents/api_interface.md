@@ -45,7 +45,8 @@
     name: <str>
 }
 ```
-- response: ```
+- response: 
+```
 {
   message: "402 all correct." | "409 conflict"
 }
@@ -62,7 +63,8 @@
     password: <str encrypted>
 }
 ```
-- response: ```
+- response: 
+```
 {
   message: "402 all correct." | "409 conflict"
 }
