@@ -14,9 +14,14 @@
  - note: each page contains 10 challenges
 - response: 
 ```
-[ 
-  0: { ... }
-]
+{
+  page: 1,
+  data: [
+    { challenge 1 }
+    { challenge 2 }
+    ...
+  ]
+}
 ```
 
 - page interface: 
