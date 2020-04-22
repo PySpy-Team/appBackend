@@ -4,8 +4,8 @@
 ```
 {
   result: [
-  0: [10 challenges for first page ]
-  1: [ ... for second page ]
+  [10 challenges for first page ],
+  [ ... for second page ],
   ...
   ]
 }
