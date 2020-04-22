@@ -13,7 +13,7 @@
 
 <hr>
 
-**GET:**`url/api/v1/challenges? page=1`<br>
+**GET:**`url/api/v1/challenges<pageNumber>`<br>
 - job: return 10 challenges which belongs to first page
  - note: each page contains 10 challenges
 - `challenge_content` contains first 100 char
