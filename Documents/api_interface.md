@@ -46,7 +46,7 @@
 
 <hr>
 
-**GET:**`url/api/v1/challenges?challengeID=<int>`<br>
+**GET:**`url/api/v1/challenges/<challengeID>`<br>
 - job: return a single challenge's full detail
 - response:
 ```
