@@ -2,11 +2,13 @@
 - job: return all available challenges from database<br>
 - response: 
 ```
-[
+{
+  result: [
   0: [10 challenges for first page ]
   1: [ ... for second page ]
   ...
-]
+  ]
+}
 ```
 
 **GET:**`url/api/v1/challenges ? page=1`<br>
