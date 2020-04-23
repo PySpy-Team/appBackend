@@ -3,7 +3,7 @@ User:
 {
   name: text, default: (some random name, like "USER XSRAT");
   email: text, required: true;
-  password: text (encrypted)
+  password: text (encrypted);
   xp: number, default: 0;
   is_admin: boolean, default: false;
 }
