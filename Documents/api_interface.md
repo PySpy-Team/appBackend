@@ -100,6 +100,26 @@
   message: "200" | "400 ID not found" | "401 reaction not valid"
 }
 ```
+<hr>
+
+**POST:**`url/api/v1/UserUpdate/<userID>`<br>
+- update the user data and return new data
+- obviously if no new data is sent, the response will be current user data
+body:
+```
+{
+    password: <str encrypted>
+    name: <str>
+}
+```
+-response:
+```
+{
+    username: <str emailAddr>
+    password: <str encrypted>
+    name: <str>
+}
+```
 
 <hr>
 
