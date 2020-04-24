@@ -28,7 +28,7 @@ Challenge:
  ```
 {
   userID: text, primaryKey;
-  questionID: int , primaryKey;
+  challengeID: int , primaryKey;
   answers: {<int chioceIndex>:<bool isCorrect>,...} , required;
   reactions: ["like"] | [] , required;
 }
