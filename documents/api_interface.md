@@ -168,15 +168,15 @@ type Status =
 - POST body:
 ```json
 {
-    "username": "User"
+    "username": "User",
     "password": ".."
 }
 ```
 - response object:
 ```json
 {
-    "username": "email.com"
-    "profile_image": "http:// .. /image.png"
+    "username": "email.com",
+    "profile_image": "http:// .. /image.png",
     "is_admin": false,
     "xp": 0,
     "name": "User"
