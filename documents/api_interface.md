@@ -147,7 +147,7 @@ type Status =
 }
 ```
 - response object:
-```
+```json
 {
     "username": "email.com"
     "profile_image": "http:// .. /image.png"
@@ -166,14 +166,14 @@ type Status =
 ## POST: `url/api/user/login`<br>
 #### JOB: login with account - update Session
 - POST body:
-```
+```json
 {
     "username": "User"
     "password": ".."
 }
 ```
 - response object:
-```
+```json
 {
     "username": "email.com"
     "profile_image": "http:// .. /image.png"
