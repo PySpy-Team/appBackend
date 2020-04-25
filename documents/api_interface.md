@@ -1,160 +1,190 @@
-**GET:**`url/api/v1/challenges`<br>
-- job: return all available challenges from database<br>
-- response:
-```
+## GET: `url/api/v1/challenges`<br>
+#### JOB: return all available challenges from database<br>
+response object:
+```json
 {
-  result: [
-  [10 challenges for first page ],
-  [ ... for second page ],
-  ...
+  "result": [
+    [
+      {
+        "challengeID": 123,
+        "challengeTitle": "some text",
+        "challengeContent": "some text",
+        "choices": ["choice 1", "choice 2"],
+        "xp": 100
+      },
+    ]
   ]
 }
 ```
 
+```python 
+for page in pages:
+  for challenge in page:
+    pass
+```
+
 <hr>
 
-**GET:**`url/api/v1/challenges<pageNumber>`<br>
-- job: return 10 challenges which belongs to first page
- - note: each page contains 10 challenges
+## GET: `url/api/v1/challenges/pages/:page_number`<br>
+#### JOB: return page with specific number, page contains 10 challenges
 - `challenge_content` contains first 100 char
-- response:
-```
+- response object:
+```json
 {
-  page: <int>,
-  data: [
-    { challenge 1 }
-    { challenge 2 }
-    ...
+  "page": 10,
+  "challenges": [
+      {
+        "challengeID": 123,
+        "challengeTitle": "some text",
+        "challengeContent": "some text",
+        "choices": ["choice 1", "choice 2"],
+        "xp": 100
+      }
   ]
 }
 ```
+```python
+page = data["page"]
 
-- page interface:
-```
-[
-  page: [
-    {
-      challeng_title: text
-      challenge_content: text
-      isAnsweredByUser: bool
-      challenge_id: number
-      xp: number
-    }
-  ]
-]
+for challenge in data["challenges"]:
+  pass
 ```
 
 <hr>
 
-**GET:**`url/api/v1/challenges/<challengeID>`<br>
-- job: return a single challenge's full detail
-- response:
-```
+## GET: `url/api/v1/challenges/:challenge_id`<br>
+#### JOB: return a specific challenge, fully detailed data.
+- response object:
+```json
 {
-  challengeID: <int>,
-  data: [
-    challengTitle: <str>
-    challengeContent: <str>
-    userAnswer: [<int>,...] # contains more than one number in case of multiple choice challenge
-    choices:[<str>,<str>,...]
-    correctChoice: [<int>,...]
-    author: <str username>
-    percentOfCorrectAnswer: <int>
-    challenge_id: <int>
-    xp: <int>
-  ]
+  "challenge_id": 124,
+  "challenge_title": "some text",
+  "challenge_content": "some text",
+  "choices":["some text", "some text"],
+  "corrects": [true, false],
+  "author": 123123,
+  "percent_of_corrects": 12,
+  "xp": 100
 }
+```
+```python
+for key in challenge:
+  item = challenge[key]
+  pass
 ```
 
 <hr>
 
-**GET:**`url/api/v1/challengeReaction/<challengeID>`<br>
-- send answers or likes
-- body:
+## GET: `url/api/v1/challenges/answers/:challenge_id`<br>
+#### JOB: response with user's answers
+- response object:
 ```
 {
-  answers: [<int>,...]
+  "user_answer": [true, false, false]
 }
 ```
-- response:
-```
-{
-  message: "200" | "400 ID not found" | "401 answer index not valid"
-}
+```typescript
+type Status = 
+ | 200 // all correct, [] for challenge that not answered
+ | 400 // invalid ID
+ | 403 // user not found - login required
+ | 503 // internal error
 ```
 
 <hr>
 
-**GET:**`url/api/v1/challengeReaction/<challengeID>`<br>
-- send answers or likes
-- body:
+## GET: `url/api/v1/challenges/reactions/challenge_id`<br>
+#### response object:
 ```
 {
-  reaction: "like"
+  "reaction": "like"
 }
+```
+```typescript
+types Status = 
+  | 200 // all correct
+  | 400 // invalid id
+  | 403 // user not found - login required
+  | 503 // internal error
 ```
 
-- response:
-```
-{
-  message: "200" | "400 ID not found" | "401 reaction not valid"
-}
-```
 <hr>
 
-**POST:**`url/api/v1/UserUpdate/<userID>`<br>
-- update the user data and return new data
+## POST: `url/api/v1/user/update`<br>
+#### JOB: update the user data and return new data
 - obviously if no new data is sent, the response will be current user data
-body:
-```
+- user's data will be taken from Session.
+reponse object:
+```json
 {
-    password: <str encrypted>
-    name: <str>
+    "password": "...",
+    "name": "new Name"
 }
 ```
--response:
-```
+- response:
+```json
 {
-    username: <str emailAddr>
-    password: <str encrypted>
-    name: <str>
+  "messaage": "all correct" | "problematic"
 }
 ```
+```typescript
+type Status = 
+  | 200 // all correct
+  | 403 // login requried
+  | 503 // internal error
+```
+#### NOTE: Client-Side should consider re-login
 
 <hr>
 
-**POST**: `url/api/auth/signup`
-<br>
-- body:
-```
+## POST: `url/api/user/signup` <br>
+#### JOB: add new user.
+- POST body: 
+```json
 {
-    username: <str emailAddr>
-    password: <str encrypted>
-    name: <str>
+  "username": "email.com",
+  "password": "..."
 }
 ```
-- response:
+- response object:
 ```
 {
-  message: "402 all correct." | "409 conflict"
+    "username": "email.com"
+    "profile_image": "http:// .. /image.png"
+    "is_admin": false,
+    "xp": 0,
+    "name": "User"
 }
 ```
- - status codes: 402: all correct, 409: "not correct"
+```typescript
+type Status = 
+  | 200 // all correct
+  | 403 // invalid data
+  | 503 // internal error
+```
 
-
-**POST**: `url/api/auth/signin`
-<br>
-**body:**:
+## POST: `url/api/user/login`<br>
+#### JOB: login with account - update Session
+- POST body:
 ```
 {
-    username: <str emailAddr>
-    password: <str encrypted>
+    "username": "User"
+    "password": ".."
 }
 ```
-- response:
+- response object:
 ```
 {
-  message: "402 all correct." | "409 conflict"
+    "username": "email.com"
+    "profile_image": "http:// .. /image.png"
+    "is_admin": false,
+    "xp": 0,
+    "name": "User"
 }
 ```
- - status codes: 402: all correct, 409: "not correct"
+```typescript
+type Status = 
+  | 200 // all correct
+  | 403 // nothing is correct
+  | 503 // internal error
+```
