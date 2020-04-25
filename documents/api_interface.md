@@ -114,7 +114,7 @@ types Status =
 #### JOB: update the user data and return new data
 - obviously if no new data is sent, the response will be current user data
 - user's data will be taken from Session.
-reponse object:
+- POST object:
 ```json
 {
     "password": "...",
