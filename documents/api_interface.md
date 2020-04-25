@@ -6,9 +6,9 @@ response object:
   "result": [
     [
       {
-        "challengeID": 123,
-        "challengeTitle": "some text",
-        "challengeContent": "some text",
+        "challenge_id": 123,
+        "challenge_title": "some text",
+        "challenge_content": "some text",
         "choices": ["choice 1", "choice 2"],
         "xp": 100
       },
