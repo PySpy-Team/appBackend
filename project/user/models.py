@@ -1,14 +1,27 @@
 from django.db import models
-from django.contrib.auth.models import User as BaseUser
-
+from django.contrib.auth.models import AbstractBaseUser
 import random, string
 
-class User(BaseUser):
+# each user has it's own image folder
+# user with primary key 1 will get stored in /user_1/image.png
+def user_image_path(self, filename):
+    return 'upload/user_{0}/{1}'.format(self.id, filename) 
+
+class UserModel(AbstractBaseUser):
     # by default email field in django's User model is optional
-    # we define it as a required field
-    email = models.EmailField(unique=True, blank=True)
+    # we need to define our email field to be unique and required
+
+    username = models.CharField(max_length=200)
+
+    #email field should be unique, and immutable
+    email = models.EmailField(unique=True)
+    profile = models.ImageField(upload_to=user_image_path, default='upload/default.png')
     xp = models.IntegerField(default=0)
     is_admin = models.BooleanField(default=False)
+
+    REQUIRED_FIELDS = []
+    # auth will be based on email
+    USERNAME_FIELD = "email"
 
     def save(self, *args, **kwargs):
 
@@ -21,6 +34,11 @@ class User(BaseUser):
             # update field with generated name
             self.username = f"user {userID}"
 
-        super(User, self).save(*args, **kwargs)
+        # encrypt password
+        self.set_password(self.password)
+
+        super(UserModel, self).save(*args, **kwargs)
+
+
 
     
