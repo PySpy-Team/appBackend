@@ -37,6 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
+    'rest_framework.authtoken',
     'user'
 ]
 
@@ -81,9 +83,13 @@ DATABASES = {
     }
 }
 
-
 AUTH_USER_MODEL = "user.UserModel" 
-AUTHENTICATION_BACKENDS = ['user.auth.AuthBackend']
+
+AUTHENTICATION_BACKENDS = (
+        'user.auth.AuthBackend',
+        'django.contrib.auth.backends.RemoteUserBackend',
+        'django.contrib.auth.backends.ModelBackend',
+)
 
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators

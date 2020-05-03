@@ -1,13 +1,23 @@
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser
+from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
+from .managers import UserManager
 import random, string
+
+# Token auth stuff.
+from django.conf import settings
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from rest_framework.authtoken.models import Token
 
 # each user has it's own image folder
 # user with primary key 1 will get stored in /user_1/image.png
 def user_image_path(self, filename):
     return 'upload/user_{0}/{1}'.format(self.id, filename) 
 
-class UserModel(AbstractBaseUser):
+class UserModel(
+    AbstractBaseUser,
+    PermissionsMixin
+    ):
     # by default email field in django's User model is optional
     # we need to define our email field to be unique and required
 
@@ -17,11 +27,18 @@ class UserModel(AbstractBaseUser):
     email = models.EmailField(unique=True)
     profile = models.ImageField(upload_to=user_image_path, default='upload/default.png')
     xp = models.IntegerField(default=0)
-    is_admin = models.BooleanField(default=False)
+    is_superuser = models.BooleanField(default=False)
+    is_staff = models.BooleanField(default=False)
 
     REQUIRED_FIELDS = []
     # auth will be based on email
     USERNAME_FIELD = "email"
+
+
+    objects = UserManager()
+
+    def __str__(self):
+        return f"{self.email} : {self.username}"
 
     def save(self, *args, **kwargs):
 
@@ -41,4 +58,7 @@ class UserModel(AbstractBaseUser):
 
 
 
-    
+@receiver(post_save, sender=settings.AUTH_USER_MODEL)
+def create_auth_token(sender, instance=None, created=False, **kwargs):
+    if created:
+        Token.objects.create(user=instance)
