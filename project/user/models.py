@@ -15,19 +15,18 @@ def user_image_path(self, filename):
     return 'upload/user_{0}/{1}'.format(self.id, filename) 
 
 class UserModel(
-    AbstractBaseUser,
-    PermissionsMixin
+        AbstractBaseUser,
+        PermissionsMixin
     ):
     # by default email field in django's User model is optional
     # we need to define our email field to be unique and required
 
     username = models.CharField(max_length=200)
 
-    #email field should be unique, and immutable
+    # email field should be unique, and immutable
     email = models.EmailField(unique=True)
     profile = models.ImageField(upload_to=user_image_path, default='upload/default.png')
     xp = models.IntegerField(default=0)
-    is_superuser = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
 
     REQUIRED_FIELDS = []
@@ -55,7 +54,6 @@ class UserModel(
         self.set_password(self.password)
 
         super(UserModel, self).save(*args, **kwargs)
-
 
 
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)

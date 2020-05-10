@@ -6,7 +6,7 @@ from .models import UserModel
 class UserModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserModel
-        fields = ['username', 'email', 'xp', 'is_superuser']
+        fields = ['username', 'email', 'xp', 'is_staff']
 
         validators = [
             UniqueTogetherValidator(

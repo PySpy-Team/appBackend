@@ -6,10 +6,14 @@ from rest_framework.response import Response
 from rest_framework import status
 
 # reading POST data.
-from .helper import get_data
+from .helper import (
+    get_data,
+    message,
+    login_required
+)
 
 # login & singup
-from django.contrib.auth import authenticate
+from .auth import authenticate
 from .serializers import UserModelSerializer
 
 
@@ -20,9 +24,9 @@ def singup(request, format=None):
     # convert json data into dictionary
     data = get_data(request)
 
-    #push POST data into serializer 
+    # push POST data into serializer
     serializer = UserModelSerializer(
-        data = data
+        data=data
     )
 
     # validate POST data
@@ -30,33 +34,32 @@ def singup(request, format=None):
 
         # add new user
         auth = authenticate(
-            email = data['email'],
-            password = data['password'],
-            create_new_user = True
+            email=data['email'],
+            password=data['password'],
+            create_new_user=True
         )
 
-        # save user's token on session
-        # next time user tagged as authenticated
-        request.session['token'] = auth.token.key
+        # save user's token on cookies
+        # next time user tagged as authenticaten
 
         # convert user object into json object
         user = UserModelSerializer(auth.user)
 
-        return Response(
+        response = Response(
             user.data,
-            status = status.HTTP_200_OK
+            status=status.HTTP_200_OK
         )
+
+        response.set_cookie('token', auth.token.key)
+        return response
 
     else:
 
-        error_message = {
-            "message": "invalid data."
-        }
-
         return Response(
-            error_message,
-            status = status.HTTP_400_BAD_REQUEST
+            message("validation failed"),
+            status=status.HTTP_400_BAD_REQUEST
         )
+
 
 @api_view(['POST'])
 def login(request):
@@ -65,28 +68,51 @@ def login(request):
     data = get_data(request)
 
     auth = authenticate(
-        email = data['email'],
-        password = data['password']
+        email=data['email'],
+        password=data['password']
     )
 
     if auth:
-        # store user's token into sesion
-        request.session['token'] = auth.token.key
-
+        # store user's token into client's cookie
         user = UserModelSerializer(auth.user)
 
-        return Response(
+        response = Response(
             user.data,
-            status = status.HTTP_200_OK
+            status=status.HTTP_200_OK
         )
+
+        response.set_cookie('token', auth.token.key)
+        return response
 
     else:
-        # return error message if authentication failed
-        error_message = {
-            "message": "user doesn't exist or wrong password"
-        }
 
         return Response(
-            error_message,
-            status = status.HTTP_403_FORBIDDEN
+            message("user doestn't exist | incorrect password"),
+            status=status.HTTP_403_FORBIDDEN
         )
+
+
+@api_view(['POST'])
+@login_required
+def update(request, user):
+
+    data = get_data(request)
+
+    # update username
+    if 'username' in data:
+        user.username = data['username']
+
+    # update password 
+    if 'password' in data:
+        # store hashed password
+        user.set_password( data['password'] )
+
+    # update user with new data
+    user.save()
+
+    serilizer = UserModelSerializer(user)
+
+    return Response(
+        data = serilizer.data,
+        status = status.HTTP_200_OK
+    )
