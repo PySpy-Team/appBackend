@@ -51,14 +51,14 @@ login_is_ok = lambda login_status: isinstance(login_status, UserModel)
 
 def login_required(func):
 
-    def decorator(request):
+    def decorator(request, *args, **kwargs):
 
         user_status = handle_login( request, Response )
 
         if not login_is_ok( user_status ):
             return user_status
     
-        return func(request, user_status)
+        return func(request, user_status, *args, **kwargs)
 
     return decorator
 

@@ -4,6 +4,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.authtoken.models import Token
+
 
 # reading POST data.
 from .helper import (
@@ -72,6 +74,8 @@ def login(request):
         password=data['password']
     )
 
+    print(auth)
+
     if auth:
         # store user's token into client's cookie
         user = UserModelSerializer(auth.user)
@@ -100,19 +104,25 @@ def update(request, user):
 
     # update username
     if 'username' in data:
+        print('update username')
         user.username = data['username']
 
     # update password 
     if 'password' in data:
         # store hashed password
+        print('update password')
         user.set_password( data['password'] )
 
     # update user with new data
     user.save()
+    print(user)
 
     serilizer = UserModelSerializer(user)
 
-    return Response(
+    response = Response(
         data = serilizer.data,
         status = status.HTTP_200_OK
     )
+
+    return response
+    

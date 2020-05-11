@@ -50,9 +50,6 @@ class UserModel(
             # update field with generated name
             self.username = f"user {userID}"
 
-        # encrypt password
-        self.set_password(self.password)
-
         super(UserModel, self).save(*args, **kwargs)
 
 
