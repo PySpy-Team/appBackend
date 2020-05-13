@@ -18,3 +18,8 @@ class ChallengeModel(models.Model):
 
     def __str__(self):
         return f"{self.title} : {self.score}"
+
+class StoreUserAnswer(models.Model):
+    user = models.ForeignKey(UserModel, on_delete = models.CASCADE)
+    challenge = models.ForeignKey(ChallengeModel, on_delete = models.CASCADE)
+    choice = models.ForeignKey(ChoiceModel, on_delete = models.CASCADE)
