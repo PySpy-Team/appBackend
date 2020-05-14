@@ -7,7 +7,7 @@ from rest_framework import status
 from user import helper as user_helper
 from . import helper as challenge_helper
 
-from .models import ChallengeModel, StoreUserAnswer
+from .models import ChallengeModel, StoreUserAnswer, ChoiceModel
 from . import serializers
 
 
@@ -38,22 +38,27 @@ def get_challenge(request, user, id):
 
 @api_view(['POST'])
 @user_helper.login_required
+# this decorator won't let user to answer twice
 @challenge_helper.memorize_user_answer
 def get_answers(request, user, challenge, id):
 
     try:
-        # update user's xp
+        # get POST data
         data = user_helper.get_data(request)
 
+        # check wich one of choices choosen.
         user_choice = filter(
             lambda item: item["id"] == data["id"],
             challenge.choices.values()
         )
 
+        # convert filter object to list
         user_choice = list(user_choice)
-        print(user_choice)
 
-        out_of_choices = lambda data: len(data) == 0
+
+        # the case which user choice was out of avaible choices
+        # the choice id does not belongs to any of choies.
+        out_of_choices = len( user_choice ) == 0
 
         if out_of_choices:
             return Response(
@@ -61,7 +66,8 @@ def get_answers(request, user, challenge, id):
                 status=status.HTTP_406_NOT_ACCEPTABLE
             )
 
-        # user should send choice ID
+        # check if user choosen correct choice
+        # then increase user's xp 
         for choice in challenge.choices.values():
             if data['id'] == choice['id']:
                 if choice['is_correct']:
@@ -70,11 +76,23 @@ def get_answers(request, user, challenge, id):
                     user.save()
 
         # save user answer
+        # next time @memorize_user_answer
+        # wont let user to answer this challenge again
+
+        # user_choice is correcntly a dic object
+        # it should be ChoiceModel instance
+        user_choice = ChoiceModel.objects.get(
+            pk = user_choice[0]['id']
+        )
+
         storage = StoreUserAnswer(
             user=user,
             challenge=challenge,
-            choice=user_choice[0]
+            choice=user_choice
         )
+
+        # save into DB
+        storage.save()
 
         answers = serializers.AnswerSerializer(challenge)
 
@@ -89,8 +107,6 @@ def get_answers(request, user, challenge, id):
         )
 
     except Exception as err:
-
-        print(err)
 
         return Response(
             user_helper.message('challenge not found'),
