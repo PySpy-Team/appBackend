@@ -33,8 +33,7 @@ class Author(serializers.ModelSerializer):
         model = UserModel
         fields = [
             'id',
-            'username',
-            'profile'
+            'username'
         ]
 
 class ChallengeSerializer(serializers.ModelSerializer):

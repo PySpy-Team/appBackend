@@ -1,7 +1,8 @@
 from rest_framework.response import Response
 from rest_framework import status
 from user import helper
-from .models import StoreUserAnswer, ChallengeModel
+from .models import StoreUserAnswer, ChallengeModel, ChoiceModel
+from .serializers import AnswerSerializer
 
 def memorize_user_answer(func):
 
@@ -15,19 +16,26 @@ def memorize_user_answer(func):
 
             return Response (
                 helper.message('challenge not found'),
-                status=status.HTTP_404_NOT_FOUND
+                status = status.HTTP_404_NOT_FOUND
             )
 
         # now check if user already answered.
         # it will raise an erro if doesn't exist
-        try:
+        try: 
             user_answered = StoreUserAnswer.objects.get(
                 user = user, 
                 challenge = challenge
             )
 
+            answer = AnswerSerializer(challenge)
+
+            result = {
+                ** helper.message('user already answered this challenge.'),
+                ** answer.data
+            }
+
             return Response(
-                helper.message('user already answered this challenge.'),
+                result,
                 status = status.HTTP_403_FORBIDDEN
             )
 
@@ -36,3 +44,16 @@ def memorize_user_answer(func):
             return func(request, user, challenge, id, *args, **kwargs)
 
     return decorator
+
+def save_choices(choices) -> list:
+    for choice in choices:
+        
+        # save each choice into DB
+        choice = ChoiceModel(
+            body = choice['body'],
+            is_correct = choice['is_correct']
+        )
+
+        choice.save()
+
+        yield choice

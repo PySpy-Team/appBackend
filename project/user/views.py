@@ -16,7 +16,8 @@ from .helper import (
 
 # login & singup
 from .auth import authenticate
-from .serializers import UserModelSerializer
+from .serializers import UserModelSerializer, ChallengeHeaderSerializer
+from .models import UserModel
 
 
 @csrf_exempt
@@ -107,11 +108,11 @@ def update(request, user):
         print('update username')
         user.username = data['username']
 
-    # update password 
+    # update password
     if 'password' in data:
         # store hashed password
         print('update password')
-        user.set_password( data['password'] )
+        user.set_password(data['password'])
 
     # update user with new data
     user.save()
@@ -120,9 +121,33 @@ def update(request, user):
     serilizer = UserModelSerializer(user)
 
     response = Response(
-        data = serilizer.data,
-        status = status.HTTP_200_OK
+        data=serilizer.data,
+        status=status.HTTP_200_OK
     )
 
     return response
-    
+
+
+@api_view(['GET'])
+@login_required
+def get_user_challenges( request, user: UserModel ):
+
+    try:
+        challenges = user.challenges
+        serilizer = ChallengeHeaderSerializer(
+            challenges.all(),
+            many = True
+        )
+
+        return Response(
+            serilizer.data,
+            status=status.HTTP_200_OK
+        )
+
+    except Exception as err:
+        print(err)
+
+        return Response(
+            message('something is wrong.'),
+            status = status.HTTP_500_INTERNAL_SERVER_ERROR
+        )

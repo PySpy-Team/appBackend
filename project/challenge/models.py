@@ -10,7 +10,7 @@ class ChoiceModel(models.Model):
 
 class ChallengeModel(models.Model):
     author = models.ForeignKey(UserModel, null=True, on_delete = models.SET_NULL)
-    title = models.CharField(max_length = 200)
+    title = models.CharField(max_length = 200, unique=True)
     content = models.TextField()
     score = models.IntegerField()
 

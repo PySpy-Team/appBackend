@@ -9,6 +9,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from rest_framework.authtoken.models import Token
 
+
 # each user has it's own image folder
 # user with primary key 1 will get stored in /user_1/image.png
 def user_image_path(self, filename):
@@ -25,9 +26,15 @@ class UserModel(
 
     # email field should be unique, and immutable
     email = models.EmailField(unique=True)
-    profile = models.ImageField(upload_to=user_image_path, default='upload/default.png')
     xp = models.IntegerField(default=0)
     is_staff = models.BooleanField(default=False)
+
+    # each challenge has author field
+    # which relate to UserModel
+    # also each user has it's challenge list
+    challenges = models.ManyToManyField(
+        "challenge.ChallengeModel"
+    )
 
     REQUIRED_FIELDS = []
     # auth will be based on email

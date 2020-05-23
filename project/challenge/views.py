@@ -5,6 +5,7 @@ from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
 from rest_framework import status
 from user import helper as user_helper
+from user.models import UserModel
 from . import helper as challenge_helper
 
 from .models import ChallengeModel, StoreUserAnswer, ChoiceModel
@@ -13,7 +14,7 @@ from . import serializers
 
 @api_view(['GET'])
 @user_helper.login_required
-def get_challenge(request, user, id):
+def get_challenge(request, user: UserModel, id: int):
 
     # try to find the challenge.
     try:
@@ -35,6 +36,60 @@ def get_challenge(request, user, id):
             status=status.HTTP_404_NOT_FOUND
         )
 
+
+@api_view(['POST'])
+@user_helper.login_required
+def create_challenge(request, user: UserModel):
+
+    data = user_helper.get_data(request)
+
+    # serializer also will look for author
+    # author is a instance from UserModel
+    # in the form of Dictionary
+    author = serializers.Author(user)
+    data['author'] = author.data
+
+
+    new_challenge = serializers.ChallengeSerializer(
+        data = data
+    )
+
+    if new_challenge.is_valid():
+
+        # first save all choices
+        choices = challenge_helper.save_choices(
+            choices = data['choices']
+        )
+
+        # save the challenge
+        challenge = ChallengeModel(
+            author = user,
+            title = data['title'],
+            content = data['content'],
+            score = data['score']
+        )
+
+        challenge.save()
+
+        # add all choices to challenge
+        for choice in choices:
+            challenge.choices.add(choice)
+
+        # add challenge to user's list
+        user.challenges.add(challenge)
+
+        serilizer = serializers.ChallengeHeaderSerializer(challenge)
+
+        return Response(
+            data = serilizer.data,
+            status = status.HTTP_201_CREATED
+        )
+
+
+    return Response(
+        data = user_helper.message('invalid fields'),
+        status = status.HTTP_400_BAD_REQUEST
+    )
 
 @api_view(['POST'])
 @user_helper.login_required
@@ -86,9 +141,9 @@ def get_answers(request, user, challenge, id):
         )
 
         storage = StoreUserAnswer(
-            user=user,
-            challenge=challenge,
-            choice=user_choice
+            user = user,
+            challenge = challenge,
+            choice = user_choice
         )
 
         # save into DB
@@ -97,16 +152,16 @@ def get_answers(request, user, challenge, id):
         answers = serializers.AnswerSerializer(challenge)
 
         result = {
-            **answers.data,
+            ** answers.data,
             'current_xp': user.xp
         }
-
+ 
         return Response(
             result,
             status=status.HTTP_200_OK
         )
 
-    except Exception as err:
+    except:
 
         return Response(
             user_helper.message('challenge not found'),
